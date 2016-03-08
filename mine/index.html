@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<link rel='stylesheet prefetch' href='//codepen.io/assets/reset/normalize.css'>
+	<link rel='stylesheet prefetch' href='css/main.css'>
+	<link rel='stylesheet prefetch' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css'>
+	<script src='//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+	<script src='https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js'></script>
+	<script>
+	$(document).ready(function(){
+		var $contenidoDynam = $('#contenidoDynam'),
+			$contenido 		= $('#contenido');
+
+		if (Modernizr.history) {
+			//Soportado History API
+			$('ul.links > li > button').click(function(){
+				event.preventDefault();
+				url_href = $(this).data('content');
+				$("ul.links > li > button").removeClass("active");
+				$(this).addClass("active");
+				history.pushState(null, null, url_href);
+  				// Cargar contenido
+      			cargarContenido(url_href);
+			});
+		} else {
+			//No Soportado History API
+		}
+		$(window).on("popstate", function() {
+		    link = location.pathname.replace(/^.*[\\/]/, ""); // get filename only
+		    console.log(link);
+		    cargarContenido(link);
+		});
+
+
+		function cargarContenido(url_href){
+			if(url_href!='')
+				$.ajax({
+					url:'loads/'+url_href+'.txt',
+					type:"POST",
+					data: {type:'ajax'},
+					success: function(data){
+						
+						$contenido.html(data);
+					},
+					error: function(XMLHttpRequest, textStatus, errorThrown) { 
+							alert("Status: " + textStatus); alert("Error: " + errorThrown); 
+					}
+				});
+			else
+				$contenido.html('');
+		}
+
+	});
+	</script>
+</head>
+<body>
+	<ul class="links">
+		<li><button data-content="load1" class="btn btn-default">Contenido 1</button></li>
+		<li><button data-content="load2" class="btn btn-primary">Contenido 2</button></li>
+		<li><button data-content="load3" class="btn btn-success">Contenido 3</button></li>
+	</ul>
+	<div id="contenidoDynam">
+		<div id="contenido">
+			
+		</div>
+	</div>
+</body>
+</html>
